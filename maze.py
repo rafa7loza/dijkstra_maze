@@ -5,7 +5,6 @@ import time
 from svglib.svglib import svg2rlg
 from reportlab .graphics import renderPM
 from Cell import Cell
-from Traps import Traps
 
 
 # Disclaim: Most part of this code was taken from the source mentioned below.
@@ -27,7 +26,7 @@ class Maze:
 
         self.nx, self.ny = nx, ny
         self.ix, self.iy = ix, iy
-        self.svgname = "maze.svg"
+        self.svg_name = "maze.svg"
         self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
 
         self.initial_x, self.initial_y = random.randint(0, nx-1), random.randint(0, ny-1)
@@ -35,13 +34,13 @@ class Maze:
         self.cell_at(self.initial_x, self.initial_x).occupied = True
         print(self.initial_x, self.initial_y)
 
-        self.traps = []
         for i in range(num_traps):
             while True:
                 _x, _y = random.randint(0, nx-1), random.randint(0, ny-1)
                 if not self.cell_at(_x, _y).occupied:
-                    self.traps.append(Traps(_x, _y, random.randint(2, 10)))
+                    w = random.randint(2, 9)
                     self.cell_at(_x, _y).occupied = True
+                    self.cell_at(_x, _y).weight = w
                     break
 
     def cell_at(self, x, y):
@@ -56,7 +55,7 @@ class Maze:
         for y in range(self.ny):
             maze_row = ['|']
             for x in range(self.nx):
-                prefix = " "
+                prefix = str(self.cell_at(x, y).weight)
                 if self.cell_at(x, y).is_current_position:
                     prefix = "*"
                 if self.cell_at(x, y).walls['E']:
@@ -92,7 +91,7 @@ class Maze:
 
         def write_object(file, x_coordinate, y_coordinate, radius):
             """Write an image to the SVG"""
-            file.write('\t<circle cx="{}" cy="{}" r="{}"/>\n'
+            file.write('\t<circle cx="{}" cy="{}" r="{}" fill="blue"/>\n'
                        .format(x_coordinate, y_coordinate, radius))
 
         # Write the SVG image file for maze
@@ -119,7 +118,9 @@ class Maze:
                     if self.cell_at(x, y).walls['E']:
                         x1, y1, x2, y2 = (x+1)*scx, y*scy, (x+1)*scx, (y+1)*scy
                         write_wall(f, x1, y1, x2, y2)
-                    if self.cell_at(x, y).is_current_position:
+
+                    # Draw any circle in the maze
+                    if self.cell_at(x, y).occupied:
                         adjustment = (3*padding)/ 2
                         if x == 0:
                             _x = x*scx + adjustment
@@ -130,6 +131,7 @@ class Maze:
                         else:
                             _y = y * scy - adjustment
                         w, h = padding, padding
+
                         write_object(file=f,
                                      x_coordinate=_x,
                                      y_coordinate=_y,
@@ -144,12 +146,12 @@ class Maze:
     def find_valid_neighbours(self, cell):
         """Return a list of unvisited neighbours to cell."""
 
-        delta = [('W', (-1,0)),
-                 ('E', (1,0)),
-                 ('S', (0,1)),
-                 ('N', (0,-1))]
+        delta = [('W', (-1, 0)),
+                 ('E', (1, 0)),
+                 ('S', (0, 1)),
+                 ('N', (0, -1))]
         neighbours = []
-        for direction, (dx,dy) in delta:
+        for direction, (dx, dy) in delta:
             x2, y2 = cell.x + dx, cell.y + dy
             if (0 <= x2 < self.nx) and (0 <= y2 < self.ny):
                 neighbour = self.cell_at(x2, y2)
