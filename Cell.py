@@ -9,13 +9,14 @@ class Cell:
     # A wall separates a pair of cells in the N-S or W-E directions.
     wall_pairs = {'N': 'S', 'S': 'N', 'E': 'W', 'W': 'E'}
 
-    def __init__(self, x, y, w=0):
+    def __init__(self, x, y, w=1):
         """Initialize the cell at (x,y). At first it is surrounded by walls."""
 
         self.x, self.y = x, y
         self.walls = {'N': True, 'S': True, 'E': True, 'W': True}
         self.is_current_position = False
         self.weight = w
+        self.occupied = False
 
     def has_all_walls(self):
         """Does this cell still have all its walls?"""

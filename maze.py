@@ -6,6 +6,7 @@ import time
 from svglib.svglib import svg2rlg
 from reportlab .graphics import renderPM
 from Cell import Cell
+from Traps import Traps
 
 
 # Create a maze using the depth-first algorithm described at
@@ -15,7 +16,7 @@ from Cell import Cell
 class Maze:
     """A Maze, represented as a grid of cells."""
 
-    def __init__(self, nx, ny, ix=0, iy=0):
+    def __init__(self, nx, ny, ix=0, iy=0, num_traps = 10):
         """Initialize the maze grid.
         The maze consists of nx x ny cells and will be constructed starting
         at the cell indexed at (ix, iy).
@@ -26,9 +27,20 @@ class Maze:
         self.ix, self.iy = ix, iy
         self.svgname = "maze.svg"
         self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
+
         self.initial_x, self.initial_y = random.randint(0, nx-1), random.randint(0, ny-1)
         self.cell_at(self.initial_x, self.initial_y).is_current_position = True
+        self.cell_at(self.initial_x, self.initial_x).occupied = True
         print(self.initial_x, self.initial_y)
+
+        self.traps = []
+        for i in range(num_traps):
+            while True:
+                _x, _y = random.randint(0, nx-1), random.randint(0, ny-1)
+                if not self.cell_at(_x, _y).occupied:
+                    self.traps.append(Traps(_x, _y, random.randint(2, 10)))
+                    self.cell_at(_x, _y).occupied = True
+                    break
 
     def cell_at(self, x, y):
         """Return the Cell object at (x,y)."""
