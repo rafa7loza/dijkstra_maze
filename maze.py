@@ -14,6 +14,7 @@ from Cell import Cell
 # https://scipython.com/blog/making-a-maze/
 # Christian Hill, April 2017.
 
+
 class Maze:
     """A Maze, represented as a grid of cells."""
 
@@ -29,19 +30,31 @@ class Maze:
         self.svg_name = "maze.svg"
         self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
 
-        self.initial_x, self.initial_y = random.randint(0, nx-1), random.randint(0, ny-1)
+        self.initial_x, self.initial_y = random.randint(0, nx - 1), random.randint(0, ny - 1)
         self.cell_at(self.initial_x, self.initial_y).is_current_position = True
-        self.cell_at(self.initial_x, self.initial_x).occupied = True
+        self.cell_at(self.initial_x, self.initial_y).occupied = True
         print(self.initial_x, self.initial_y)
 
+        # Generating the traps
         for i in range(num_traps):
-            while True:
-                _x, _y = random.randint(0, nx-1), random.randint(0, ny-1)
-                if not self.cell_at(_x, _y).occupied:
-                    w = random.randint(2, 9)
-                    self.cell_at(_x, _y).occupied = True
-                    self.cell_at(_x, _y).weight = w
-                    break
+            _x, _y = self.generate_random_position(nx, ny)
+            w = random.randint(2, 9)
+            self.cell_at(_x, _y).occupied = True
+            self.cell_at(_x, _y).weight = w
+
+        cnt = 0
+        for row in self.maze_map:
+            for elem in row:
+                if elem.occupied:
+                    print(str(elem.x) + " " + str(elem.y) + ": " + str(elem.is_current_position))
+                    cnt += 1
+        print(cnt)
+
+    def generate_random_position(self, x, y):
+        while True:
+            _x, _y = random.randint(0, x - 1), random.randint(0, y - 1)
+            if not self.cell_at(_x, _y).occupied:
+                return [_x, _y]
 
     def cell_at(self, x, y):
         """Return the Cell object at (x,y)."""
@@ -55,7 +68,7 @@ class Maze:
         for y in range(self.ny):
             maze_row = ['|']
             for x in range(self.nx):
-                prefix = str(self.cell_at(x, y).weight)
+                prefix = " "
                 if self.cell_at(x, y).is_current_position:
                     prefix = "*"
                 if self.cell_at(x, y).walls['E']:
@@ -89,10 +102,10 @@ class Maze:
             f.write('\t<line x1="{}" y1="{}" x2="{}" y2="{}"/>\n'
                     .format(x1, y1, x2, y2),)
 
-        def write_object(file, x_coordinate, y_coordinate, radius):
+        def write_circle(file, x_coordinate, y_coordinate, radius, color):
             """Write an image to the SVG"""
-            file.write('\t<circle cx="{}" cy="{}" r="{}" fill="blue"/>\n'
-                       .format(x_coordinate, y_coordinate, radius))
+            file.write('\t<circle cx="{}" cy="{}" r="{}" fill="{}"/>\n'
+                       .format(x_coordinate, y_coordinate, radius, color))
 
         # Write the SVG image file for maze
         with open(filename, 'w') as f:
@@ -121,21 +134,23 @@ class Maze:
 
                     # Draw any circle in the maze
                     if self.cell_at(x, y).occupied:
-                        adjustment = (3*padding)/ 2
-                        if x == 0:
-                            _x = x*scx + adjustment
-                        else:
-                            _x = x*scx - adjustment
-                        if y == 0:
-                            _y = y * scy + adjustment
-                        else:
-                            _y = y * scy - adjustment
-                        w, h = padding, padding
+                        adjustment = (3*padding) / 2
+                        _x = x*scx + adjustment
+                        _y = y * scy + adjustment
 
-                        write_object(file=f,
-                                     x_coordinate=_x,
-                                     y_coordinate=_y,
-                                     radius=padding)
+                        if self.cell_at(x, y).is_current_position:
+                            print("Debbug")
+                            write_circle(file=f,
+                                         x_coordinate=_x,
+                                         y_coordinate=_y,
+                                         radius=padding,
+                                         color="blue")
+                        else:
+                            write_circle(file=f,
+                                         x_coordinate=_x,
+                                         y_coordinate=_y,
+                                         radius=padding,
+                                         color="red")
 
             # Draw the North and West maze border, which won't have been drawn
             # by the procedure above.
@@ -202,10 +217,10 @@ def main():
 
     img = mpimg.imread(image_name)
     imgplot = plt.imshow(img)
-    plt.show()
-    """
-    for n in range(2, 15):
-        maze = Maze(n, n)
+    # plt.show()
+
+    for n in range(2, 16):
+        maze = Maze(n, n, num_traps=int((n*3)/4))
         maze.make_maze()
         maze.write_svg(svg_name)
         draw = svg2rlg(svg_name)
@@ -217,7 +232,7 @@ def main():
         time.sleep(0.1)
 
     plt.show()
-    """
+
 
 
 if __name__ == "__main__":

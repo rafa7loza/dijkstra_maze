@@ -17,6 +17,7 @@ class Cell:
         self.is_current_position = False
         self.weight = w
         self.occupied = False
+        self.is_objective = False
 
     def has_all_walls(self):
         """Does this cell still have all its walls?"""
