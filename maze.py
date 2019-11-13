@@ -87,12 +87,12 @@ class Maze:
 
         def write_wall(f, x1, y1, x2, y2):
             """Write a single wall to the SVG image file handle f."""
-            f.write('<line x1="{}" y1="{}" x2="{}" y2="{}"/>\n'
+            f.write('\t<line x1="{}" y1="{}" x2="{}" y2="{}"/>\n'
                     .format(x1, y1, x2, y2),)
 
         def write_object(file, x_coordinate, y_coordinate, radius):
             """Write an image to the SVG"""
-            file.write('<circle cx="{}" cy="{}" r="{}"/>\n'
+            file.write('\t<circle cx="{}" cy="{}" r="{}"/>\n'
                        .format(x_coordinate, y_coordinate, radius))
 
         # Write the SVG image file for maze
@@ -104,11 +104,9 @@ class Maze:
             f.write('\twidth="{:d}" height="{:d}" viewBox="{} {} {} {}">'
                     .format(width+2*padding, height+2*padding,
                     -padding, -padding, width+2*padding, height+2*padding))
-            f.write('<defs>\n<style type="text/css"><![CDATA[')
-            f.write('line {')
-            f.write('    stroke: #000000;\n    stroke-linecap: square;')
-            f.write('    stroke-width: 5;\n}')
-            f.write(']]></style>\n</defs>')
+            f.write('<defs>\n<style type="text/css"><![CDATA[line {\n')
+            f.write('\tstroke: #000000;\n\tstroke-linecap: square;\n\tstroke-width: 5;\n}')
+            f.write(']]></style>\n</defs>\n')
             # Draw the "South" and "East" walls of each cell, if present (these
             # are the "North" and "West" walls of a neighbouring cell in
             # general, of course).
@@ -139,8 +137,8 @@ class Maze:
 
             # Draw the North and West maze border, which won't have been drawn
             # by the procedure above.
-            f.write('<line x1="0" y1="0" x2="{}" y2="0"/>'.format(width))
-            f.write('<line x1="0" y1="0" x2="0" y2="{}"/>'.format(height))
+            f.write('\t<line x1="0" y1="0" x2="{}" y2="0"/>\n'.format(width))
+            f.write('\t<line x1="0" y1="0" x2="0" y2="{}"/>\n'.format(height))
             f.write('</svg>')
 
     def find_valid_neighbours(self, cell):
