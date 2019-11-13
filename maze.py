@@ -33,7 +33,6 @@ class Maze:
         self.initial_x, self.initial_y = random.randint(0, nx - 1), random.randint(0, ny - 1)
         self.cell_at(self.initial_x, self.initial_y).is_current_position = True
         self.cell_at(self.initial_x, self.initial_y).occupied = True
-        print(self.initial_x, self.initial_y)
 
         # Generating the traps
         for i in range(num_traps):
@@ -41,14 +40,6 @@ class Maze:
             w = random.randint(2, 9)
             self.cell_at(_x, _y).occupied = True
             self.cell_at(_x, _y).weight = w
-
-        cnt = 0
-        for row in self.maze_map:
-            for elem in row:
-                if elem.occupied:
-                    print(str(elem.x) + " " + str(elem.y) + ": " + str(elem.is_current_position))
-                    cnt += 1
-        print(cnt)
 
     def generate_random_position(self, x, y):
         while True:
