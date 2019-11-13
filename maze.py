@@ -1,4 +1,3 @@
-# % pylab inline
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 import random
@@ -8,6 +7,9 @@ from reportlab .graphics import renderPM
 from Cell import Cell
 from Traps import Traps
 
+
+# Disclaim: Most part of this code was taken from the source mentioned below.
+# It has been modified according to my needs.
 
 # Create a maze using the depth-first algorithm described at
 # https://scipython.com/blog/making-a-maze/
