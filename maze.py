@@ -61,13 +61,13 @@ class Maze:
         x, y = self.__generate_random_position(self.nx, self.ny)
         self.cell_at(x, y).is_objective = True
         self.cell_at(x, y).occupied = True
-        self.__current_position = (x, y)
+        self.__objective_position = (x, y)
 
     def __initialize_current_position(self):
         x, y = self.__generate_random_position(self.nx, self.ny)
         self.cell_at(x, y).is_current_position = True
         self.cell_at(x, y).occupied = True
-        self.__objective_position = (x, y)
+        self.__current_position = (x, y)
 
     def get_current_position(self):
         return self.__current_position
