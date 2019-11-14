@@ -4,6 +4,7 @@ from random import randint, choice
 import time
 from svglib.svglib import svg2rlg
 from reportlab .graphics import renderPM
+from math import floor
 from Cell import Cell
 from Graph import Graph
 
@@ -73,9 +74,17 @@ class Maze:
         return self.__current_position
 
     def update_current_position(self, coordinates):
+        x, y = self.__current_position
+        self.cell_at(x, y).is_current_position = False
+        self.cell_at(x, y).occupied = False
+
+        x, y = coordinates
+        self.cell_at(x, y).is_current_position = True
+        self.cell_at(x, y).occupied = True
+
         self.__current_position = coordinates
 
-    def get_objective_poistion(self):
+    def get_objective_position(self):
         return self.__objective_position
 
     def cell_at(self, x, y):
@@ -271,32 +280,32 @@ def main():
     maze.make_maze()
 
     # print(maze)
-    maze.write_svg(svg_name)
-    draw = svg2rlg(svg_name)
-    renderPM.drawToFile(draw, image_name, fmt='PNG')
+    # maze.write_svg(svg_name)
+    # draw = svg2rlg(svg_name)
+    # renderPM.drawToFile(draw, image_name, fmt='PNG')
 
 
-    img = mpimg.imread(image_name)
-    imgplot = plt.imshow(img)
+    # img = mpimg.imread(image_name)
+    # imgplot = plt.imshow(img)
 
     # graph = generate_graph(maze, nx, ny)
     graph = generate_graph(maze, nx, ny)
     print(maze.get_current_position())
-    print(maze.get_objective_poistion())
+    print(maze.get_objective_position())
     # print(graph)
     source = maze.get_current_position()
-    destination = maze.get_objective_poistion()
-    path = graph.dijsktra(destination=maze.cell_at(source[0], source[1]).get_id(),
-                          source=maze.cell_at(destination[0], destination[1]).get_id())
+    destination = maze.get_objective_position()
+    path = graph.dijsktra(source=maze.cell_at(source[0], source[1]).get_id(),
+                          destination=maze.cell_at(destination[0], destination[1]).get_id())
 
     for i in range(len(path)):
         x, y = path[i][:2]
-        path[i] = (int(x/nx), y % ny)
-        print(path[i])
+        path[i] = (floor(x/nx), y % ny)
+        # print(path[i])
 
     for p in path:
         new_position = tuple(p[:2])
-        # print(new_position)
+        print(new_position)
         maze.update_current_position(new_position)
         maze.write_svg(svg_name)
         draw = svg2rlg(svg_name)
@@ -304,8 +313,8 @@ def main():
         img = mpimg.imread(image_name)
         imgplot = plt.imshow(img)
         plt.draw()
-        # plt.pause(1e-17)
-        time.sleep(0.1)
+        plt.pause(1e-17)
+        time.sleep(0.2)
 
     plt.show()
 
