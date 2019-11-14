@@ -209,6 +209,7 @@ def main():
     imgplot = plt.imshow(img)
     # plt.show()
 
+    """
     for n in range(2, 16):
         maze = Maze(n, n, num_traps=int((n*3)/4))
         maze.make_maze()
@@ -222,7 +223,7 @@ def main():
         time.sleep(0.1)
 
     plt.show()
-
+    """
 
 
 if __name__ == "__main__":

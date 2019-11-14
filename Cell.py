@@ -21,7 +21,6 @@ class Cell:
 
         self.__size_of_maze = maze_size
         self.__id = (x*self.__size_of_maze) + y
-        print(self.__id)
 
     def change_size_of_maze(self, size):
         self.__size_of_maze = size
