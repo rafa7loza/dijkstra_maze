@@ -21,7 +21,7 @@ class Graph:
     def add_edge(self, source, destination, w):
         self.__adjacent_matrix[source][destination] = w
 
-    # Auxiliary private function for the dijsktra algorithm
+    # Auxiliary private function for the Dijsktra algorithm
     def __min_distance(self, distance, spt_set):
         minimum = inf
         min_index = 0

@@ -16,6 +16,11 @@ from Graph import Graph
 # Christian Hill, April 2017.
 
 
+UP = 'N'
+DOWN = 'S'
+LEFT = 'E'
+RIGHT = 'W'
+
 class Maze:
     """A Maze, represented as a grid of cells."""
 
@@ -33,32 +38,45 @@ class Maze:
 
         # Generating the traps
         for i in range(num_traps):
-            _x, _y = self.generate_random_position(nx, ny)
+            _x, _y = self.__generate_random_position(nx, ny)
             w = randint(2, 9)
             self.cell_at(_x, _y).occupied = True
             self.cell_at(_x, _y).update_weight(w)
 
+        self.__current_position = None
+        self.__objective_position = None
         # Generate the initial position
-        self.initialize_current_position()
+        self.__initialize_current_position()
 
         # Generate objective position
-        self.create_objective()
+        self.__create_objective()
 
-    def generate_random_position(self, x, y):
+    def __generate_random_position(self, x, y):
         while True:
             _x, _y = randint(0, x - 1), randint(0, y - 1)
             if not self.cell_at(_x, _y).occupied:
                 return [_x, _y]
 
-    def create_objective(self):
-        x, y = self.generate_random_position(self.nx, self.ny)
+    def __create_objective(self):
+        x, y = self.__generate_random_position(self.nx, self.ny)
         self.cell_at(x, y).is_objective = True
         self.cell_at(x, y).occupied = True
+        self.__current_position = (x, y)
 
-    def initialize_current_position(self):
-        x, y = self.generate_random_position(self.nx, self.ny)
+    def __initialize_current_position(self):
+        x, y = self.__generate_random_position(self.nx, self.ny)
         self.cell_at(x, y).is_current_position = True
         self.cell_at(x, y).occupied = True
+        self.__objective_position = (x, y)
+
+    def get_current_position(self):
+        return self.__current_position
+
+    def update_current_position(self, coordinates):
+        self.__current_position = coordinates
+
+    def get_objective_poistion(self):
+        return self.__objective_position
 
     def cell_at(self, x, y):
         """Return the Cell object at (x,y)."""
@@ -207,6 +225,40 @@ class Maze:
             nv += 1
 
 
+def add_edge(u, v, graph):
+    graph.add_edge(source=u.get_id(),
+                   destination=v.get_id(),
+                   w=v.get_weight())
+
+
+def generate_graph(maze, n, m):
+    # initializing the Graph
+    graph = Graph(n*m)
+
+    for i in range(m):
+        for j in range(n):
+            # print(maze.cell_at(i, j).get_id())
+            u = maze.cell_at(i, j)
+            walls = u.walls
+
+            # print("x: {}, y: {}, walls: {}".format(j, i, walls))
+
+            if not walls[UP] and j > 0:
+                v = maze.cell_at(i, j-1)
+                add_edge(v, u, graph)
+            if not walls[DOWN] and j < n-1:
+                v = maze.cell_at(i, j+1)
+                add_edge(v, u, graph)
+            if not walls[RIGHT] and i > 0:
+                v = maze.cell_at(i-1, j)
+                add_edge(v, u, graph)
+            if not walls[LEFT] and i < m-1:
+                v = maze.cell_at(i+1, j)
+                add_edge(v, u, graph)
+
+    return graph
+
+
 def main():
     image_name = 'maze.png'
     svg_name = 'maze.svg'
@@ -227,18 +279,36 @@ def main():
     img = mpimg.imread(image_name)
     imgplot = plt.imshow(img)
 
-    # initializing the Graph
-    graph = Graph(nx*ny)
-
-    for u in range(ny):
-        for v in range(nx):
-            source = maze.cell_at(u, v).get_id()
-            destination = maze.cell_at(v, u).get_id()
-            weight = maze.cell_at(u, v).get_weight()
-            graph.add_edge(source, destination, weight)
-
+    # graph = generate_graph(maze, nx, ny)
+    graph = generate_graph(maze, nx, ny)
+    print(maze.get_current_position())
+    print(maze.get_objective_poistion())
     # print(graph)
+    source = maze.get_current_position()
+    destination = maze.get_objective_poistion()
+    path = graph.dijsktra(destination=maze.cell_at(source[0], source[1]).get_id(),
+                          source=maze.cell_at(destination[0], destination[1]).get_id())
+
+    for i in range(len(path)):
+        x, y = path[i][:2]
+        path[i] = (int(x/nx), y % ny)
+        print(path[i])
+
+    for p in path:
+        new_position = tuple(p[:2])
+        # print(new_position)
+        maze.update_current_position(new_position)
+        maze.write_svg(svg_name)
+        draw = svg2rlg(svg_name)
+        renderPM.drawToFile(draw, image_name, fmt='PNG')
+        img = mpimg.imread(image_name)
+        imgplot = plt.imshow(img)
+        plt.draw()
+        # plt.pause(1e-17)
+        time.sleep(0.1)
+
     plt.show()
+
 
     """
     for n in range(2, 16):
