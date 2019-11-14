@@ -18,7 +18,7 @@ from Cell import Cell
 class Maze:
     """A Maze, represented as a grid of cells."""
 
-    def __init__(self, nx, ny, ix=0, iy=0, num_traps = 10):
+    def __init__(self, nx, ny, ix=0, iy=0, num_traps=10):
         """Initialize the maze grid.
         The maze consists of nx x ny cells and will be constructed starting
         at the cell indexed at (ix, iy).
@@ -28,7 +28,7 @@ class Maze:
         self.nx, self.ny = nx, ny
         self.ix, self.iy = ix, iy
         self.svg_name = "maze.svg"
-        self.maze_map = [[Cell(x, y) for y in range(ny)] for x in range(nx)]
+        self.maze_map = [[Cell(x, y, maze_size=nx) for y in range(ny)] for x in range(nx)]
 
         self.initial_x, self.initial_y = random.randint(0, nx - 1), random.randint(0, ny - 1)
         self.cell_at(self.initial_x, self.initial_y).is_current_position = True
@@ -130,7 +130,6 @@ class Maze:
                         _y = y * scy + adjustment
 
                         if self.cell_at(x, y).is_current_position:
-                            print("Debbug")
                             write_circle(file=f,
                                          x_coordinate=_x,
                                          y_coordinate=_y,
