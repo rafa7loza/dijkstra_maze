@@ -246,11 +246,8 @@ def generate_graph(maze, n, m):
 
     for i in range(m):
         for j in range(n):
-            # print(maze.cell_at(i, j).get_id())
             u = maze.cell_at(i, j)
             walls = u.walls
-
-            # print("x: {}, y: {}, walls: {}".format(j, i, walls))
 
             if not walls[UP] and j > 0:
                 v = maze.cell_at(i, j-1)
@@ -279,20 +276,10 @@ def main():
     maze = Maze(nx, ny, ix, iy)
     maze.make_maze()
 
-    # print(maze)
-    # maze.write_svg(svg_name)
-    # draw = svg2rlg(svg_name)
-    # renderPM.drawToFile(draw, image_name, fmt='PNG')
-
-
-    # img = mpimg.imread(image_name)
-    # imgplot = plt.imshow(img)
-
-    # graph = generate_graph(maze, nx, ny)
     graph = generate_graph(maze, nx, ny)
     print(maze.get_current_position())
     print(maze.get_objective_position())
-    # print(graph)
+
     source = maze.get_current_position()
     destination = maze.get_objective_position()
     path = graph.dijsktra(source=maze.cell_at(source[0], source[1]).get_id(),
@@ -301,7 +288,6 @@ def main():
     for i in range(len(path)):
         x, y = path[i][:2]
         path[i] = (floor(x/nx), y % ny)
-        # print(path[i])
 
     for p in path:
         new_position = tuple(p[:2])
@@ -311,29 +297,12 @@ def main():
         draw = svg2rlg(svg_name)
         renderPM.drawToFile(draw, image_name, fmt='PNG')
         img = mpimg.imread(image_name)
-        imgplot = plt.imshow(img)
+        plt.imshow(img)
         plt.draw()
         plt.pause(1e-17)
         time.sleep(0.2)
 
     plt.show()
-
-
-    """
-    for n in range(2, 16):
-        maze = Maze(n, n, num_traps=int((n*3)/4))
-        maze.make_maze()
-        maze.write_svg(svg_name)
-        draw = svg2rlg(svg_name)
-        renderPM.drawToFile(draw, image_name, fmt='PNG')
-        img = mpimg.imread(image_name)
-        imgplot = plt.imshow(img)
-        plt.draw()
-        plt.pause(1e-17)
-        time.sleep(0.1)
-
-    plt.show()
-    """
 
 
 if __name__ == "__main__":
