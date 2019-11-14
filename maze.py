@@ -1,10 +1,11 @@
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
-import random
+from random import randint, choice
 import time
 from svglib.svglib import svg2rlg
 from reportlab .graphics import renderPM
 from Cell import Cell
+from Graph import Graph
 
 
 # Disclaim: Most part of this code was taken from the source mentioned below.
@@ -30,22 +31,34 @@ class Maze:
         self.svg_name = "maze.svg"
         self.maze_map = [[Cell(x, y, maze_size=nx) for y in range(ny)] for x in range(nx)]
 
-        self.initial_x, self.initial_y = random.randint(0, nx - 1), random.randint(0, ny - 1)
-        self.cell_at(self.initial_x, self.initial_y).is_current_position = True
-        self.cell_at(self.initial_x, self.initial_y).occupied = True
-
         # Generating the traps
         for i in range(num_traps):
             _x, _y = self.generate_random_position(nx, ny)
-            w = random.randint(2, 9)
+            w = randint(2, 9)
             self.cell_at(_x, _y).occupied = True
-            self.cell_at(_x, _y).weight = w
+            self.cell_at(_x, _y).update_weight(w)
+
+        # Generate the initial position
+        self.initialize_current_position()
+
+        # Generate objective position
+        self.create_objective()
 
     def generate_random_position(self, x, y):
         while True:
-            _x, _y = random.randint(0, x - 1), random.randint(0, y - 1)
+            _x, _y = randint(0, x - 1), randint(0, y - 1)
             if not self.cell_at(_x, _y).occupied:
                 return [_x, _y]
+
+    def create_objective(self):
+        x, y = self.generate_random_position(self.nx, self.ny)
+        self.cell_at(x, y).is_objective = True
+        self.cell_at(x, y).occupied = True
+
+    def initialize_current_position(self):
+        x, y = self.generate_random_position(self.nx, self.ny)
+        self.cell_at(x, y).is_current_position = True
+        self.cell_at(x, y).occupied = True
 
     def cell_at(self, x, y):
         """Return the Cell object at (x,y)."""
@@ -135,6 +148,12 @@ class Maze:
                                          y_coordinate=_y,
                                          radius=padding,
                                          color="blue")
+                        elif self.cell_at(x, y).is_objective:
+                            write_circle(file=f,
+                                         x_coordinate=_x,
+                                         y_coordinate=_y,
+                                         radius=padding,
+                                         color="green")
                         else:
                             write_circle(file=f,
                                          x_coordinate=_x,
@@ -181,7 +200,7 @@ class Maze:
                 continue
 
             # Choose a random neighbouring cell and move to it.
-            direction, next_cell = random.choice(neighbours)
+            direction, next_cell = choice(neighbours)
             current_cell.knock_down_wall(next_cell, direction)
             cell_stack.append(current_cell)
             current_cell = next_cell
@@ -207,7 +226,19 @@ def main():
 
     img = mpimg.imread(image_name)
     imgplot = plt.imshow(img)
-    # plt.show()
+
+    # initializing the Graph
+    graph = Graph(nx*ny)
+
+    for u in range(ny):
+        for v in range(nx):
+            source = maze.cell_at(u, v).get_id()
+            destination = maze.cell_at(v, u).get_id()
+            weight = maze.cell_at(u, v).get_weight()
+            graph.add_edge(source, destination, weight)
+
+    # print(graph)
+    plt.show()
 
     """
     for n in range(2, 16):

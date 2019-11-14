@@ -14,10 +14,10 @@ class Cell:
 
         self.x, self.y = x, y
         self.walls = {'N': True, 'S': True, 'E': True, 'W': True}
-        self.is_current_position = False
-        self.weight = w
         self.occupied = False
+        self.is_current_position = False
         self.is_objective = False
+        self.__weight = w
 
         self.__size_of_maze = maze_size
         self.__id = (x*self.__size_of_maze) + y
@@ -39,3 +39,9 @@ class Cell:
 
         self.walls[wall] = False
         other.walls[Cell.wall_pairs[wall]] = False
+
+    def get_weight(self):
+        return self.__weight
+
+    def update_weight(self, w):
+        self.__weight = w
