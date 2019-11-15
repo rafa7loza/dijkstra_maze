@@ -22,10 +22,11 @@ DOWN = 'S'
 LEFT = 'E'
 RIGHT = 'W'
 
+
 class Maze:
     """A Maze, represented as a grid of cells."""
 
-    def __init__(self, nx, ny, ix=0, iy=0, num_traps=10):
+    def __init__(self, nx, ny, ix=0, iy=0):
         """Initialize the maze grid.
         The maze consists of nx x ny cells and will be constructed starting
         at the cell indexed at (ix, iy).
@@ -36,21 +37,24 @@ class Maze:
         self.ix, self.iy = ix, iy
         self.svg_name = "maze.svg"
         self.maze_map = [[Cell(x, y, maze_size=nx) for y in range(ny)] for x in range(nx)]
-
-        # Generating the traps
-        for i in range(num_traps):
-            _x, _y = self.__generate_random_position(nx, ny)
-            w = randint(2, 9)
-            self.cell_at(_x, _y).occupied = True
-            self.cell_at(_x, _y).update_weight(w)
-
         self.__current_position = None
         self.__objective_position = None
+
         # Generate the initial position
         self.__initialize_current_position()
 
         # Generate objective position
         self.__create_objective()
+
+        # Generating the traps
+        self.__generate_random_traps(max(nx, ny)*2)
+
+    def __generate_random_traps(self, traps):
+        for i in range(traps):
+            _x, _y = self.__generate_random_position(self.nx, self.ny)
+            w = randint(2, 9)
+            self.cell_at(_x, _y).occupied = True
+            self.cell_at(_x, _y).update_weight(w)
 
     def __generate_random_position(self, x, y):
         while True:
@@ -228,10 +232,28 @@ class Maze:
 
             # Choose a random neighbouring cell and move to it.
             direction, next_cell = choice(neighbours)
+            # print(neighbours)
             current_cell.knock_down_wall(next_cell, direction)
             cell_stack.append(current_cell)
             current_cell = next_cell
             nv += 1
+
+        self.__erase_random_walls()
+
+    def __erase_random_walls(self, n=None):
+        if not n:
+            n = int((self.nx*self.ny) / 3)
+
+        for i in range(n):
+            rand_x = randint(1, self.nx-2)
+            rand_y = randint(1, self.ny-2)
+            current_cell = self.cell_at(rand_x, rand_y)
+
+            walls = current_cell.walls
+            for key, value in walls.items():
+                if value:
+                    current_cell.walls[key] = False
+                    break
 
 
 def add_edge(u, v, graph):
@@ -275,7 +297,15 @@ def main():
 
     maze = Maze(nx, ny, ix, iy)
     maze.make_maze()
-
+    """
+    maze.write_svg(svg_name)
+    draw = svg2rlg(svg_name)
+    renderPM.drawToFile(draw, image_name, fmt='PNG')
+    img = mpimg.imread(image_name)
+    plt.imshow(img)
+    plt.draw()
+    plt.show()
+    """
     graph = generate_graph(maze, nx, ny)
     print(maze.get_current_position())
     print(maze.get_objective_position())
@@ -285,13 +315,14 @@ def main():
     path = graph.dijsktra(source=maze.cell_at(source[0], source[1]).get_id(),
                           destination=maze.cell_at(destination[0], destination[1]).get_id())
 
+    # print(graph)
     for i in range(len(path)):
         x, y = path[i][:2]
         path[i] = (floor(x/nx), y % ny)
 
     for p in path:
         new_position = tuple(p[:2])
-        print(new_position)
+        # print(new_position)
         maze.update_current_position(new_position)
         maze.write_svg(svg_name)
         draw = svg2rlg(svg_name)
