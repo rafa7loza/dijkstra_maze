@@ -59,15 +59,15 @@ class Maze:
                 return [_x, _y]
 
     def __create_objective(self):
-        # x, y = self.__generate_random_position(self.nx, self.ny)
-        x, y = 0, 0
+        x, y = self.__generate_random_position(self.nx, self.ny)
+        # x, y = 0, 0
         self.cell_at(x, y).is_objective = True
         self.cell_at(x, y).occupied = True
         self.__objective_position = (x, y)
 
     def __initialize_current_position(self):
-        # x, y = self.__generate_random_position(self.nx, self.ny)
-        x, y = self.nx-1, self.ny-1
+        x, y = self.__generate_random_position(self.nx, self.ny)
+        # x, y = self.nx-1, self.ny-1
         self.cell_at(x, y).is_current_position = True
         self.cell_at(x, y).occupied = True
         self.__current_position = (x, y)
@@ -233,7 +233,6 @@ class Maze:
 
             # Choose a random neighbouring cell and move to it.
             direction, next_cell = choice(neighbours)
-            # print(neighbours)
             current_cell.knock_down_wall(next_cell, direction)
             cell_stack.append(current_cell)
             current_cell = next_cell
@@ -253,5 +252,14 @@ class Maze:
             walls = current_cell.walls
             for key, value in walls.items():
                 if value:
-                    current_cell.walls[key] = False
+                    if key == 'N':
+                        rand_y += 1
+                    elif key == 'S':
+                        rand_y -= 1
+                    elif key == 'W':
+                        rand_x -= 1
+                    else:
+                        rand_x += 1
+                    next_cell = self.cell_at(rand_x, rand_y)
+                    current_cell.knock_down_wall(next_cell, key)
                     break

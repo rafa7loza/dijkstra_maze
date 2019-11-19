@@ -9,8 +9,8 @@ from maze import Maze
 
 UP = 'N'
 DOWN = 'S'
-LEFT = 'E'
-RIGHT = 'W'
+LEFT = 'W'
+RIGHT = 'E'
 
 
 def add_edge(u, v, graph):
@@ -19,26 +19,26 @@ def add_edge(u, v, graph):
                    w=v.get_weight())
 
 
-def generate_graph(maze, n, m):
+def generate_graph(maze, _nx, _mx):
     # initializing the Graph
-    graph = Graph(n*m)
+    graph = Graph(_nx * _mx)
 
-    for i in range(m):
-        for j in range(n):
-            u = maze.cell_at(i, j)
+    for _x in range(_mx):
+        for _y in range(_nx):
+            u = maze.cell_at(_x, _y)
             walls = u.walls
 
-            if not walls[UP] and j > 0:
-                v = maze.cell_at(i, j-1)
+            if not walls[UP] and _y < 0:
+                v = maze.cell_at(_x, _y-1)
                 add_edge(v, u, graph)
-            if not walls[DOWN] and j < n-1:
-                v = maze.cell_at(i, j+1)
+            if not walls[DOWN] and _y < _mx-1:
+                v = maze.cell_at(_x, _y+1)
                 add_edge(v, u, graph)
-            if not walls[RIGHT] and i > 0:
-                v = maze.cell_at(i-1, j)
+            if not walls[RIGHT] and _x < _nx-1:
+                v = maze.cell_at(_x+1, _y)
                 add_edge(v, u, graph)
-            if not walls[LEFT] and i < m-1:
-                v = maze.cell_at(i+1, j)
+            if not walls[LEFT] and _x > 0:
+                v = maze.cell_at(_x-1, _y)
                 add_edge(v, u, graph)
 
     return graph
