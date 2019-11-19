@@ -63,6 +63,13 @@ def main():
     plt.draw()
     plt.show()
     """
+
+    for i in range(ny):
+        for j in range(nx):
+            cell = maze.cell_at(i, j)
+            # print(cell.x, cell.y)
+            # print(cell.get_id())
+
     graph = generate_graph(maze, nx, ny)
     print(maze.get_current_position())
     print(maze.get_objective_position())
@@ -71,17 +78,20 @@ def main():
     destination = maze.get_objective_position()
     path = graph.dijsktra(source=maze.cell_at(source[0], source[1]).get_id(),
                           destination=maze.cell_at(destination[0], destination[1]).get_id())
-    print(path)
+    # print(path)
     # print(graph)
+    movements = []
     for i in range(len(path)):
-        x, y = path[i][:2]
-        path[i] = (floor(x/nx), y % ny)
+        positions = path[i][:2]
+        u, v = maze.get_position_by_id(positions[0]), maze.get_position_by_id(positions[1])
+        movements.append([u, v])
+        # path[i] = (x % nx, floor(y / ny))
 
-    print(path)
+    # print(path)
 
-    for p in path:
-        new_position = tuple(p[:2])
-        # print(new_position)
+    for p in movements:
+        # new_position = tuple(p[:2])
+        new_position = p[1]
         maze.update_current_position(new_position)
         maze.write_svg(svg_name)
         draw = svg2rlg(svg_name)
@@ -93,6 +103,7 @@ def main():
         time.sleep(0.2)
 
     plt.show()
+    plt.close()
 
 
 if __name__ == "__main__":

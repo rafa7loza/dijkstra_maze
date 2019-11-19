@@ -23,6 +23,9 @@ class Maze:
         self.ix, self.iy = ix, iy
         self.svg_name = "maze.svg"
         self.maze_map = [[Cell(x, y, maze_size=nx) for y in range(ny)] for x in range(nx)]
+        self.__map_ids = {}
+        self.__init_map_ids()
+
         self.__current_position = None
         self.__objective_position = None
 
@@ -34,6 +37,12 @@ class Maze:
 
         # Generating the traps
         self.__generate_random_traps(max(nx, ny)*2)
+
+    def __init_map_ids(self):
+        for i in range(self.nx):
+            for j in range(self.ny):
+                cell = self.cell_at(i, j)
+                self.__map_ids[cell.get_id()] = cell.get_position()
 
     def __generate_random_traps(self, traps):
         for i in range(traps):
@@ -62,6 +71,9 @@ class Maze:
 
     def get_current_position(self):
         return self.__current_position
+
+    def get_position_by_id(self, cell_id):
+        return self.__map_ids[cell_id]
 
     def update_current_position(self, coordinates):
         x, y = self.__current_position

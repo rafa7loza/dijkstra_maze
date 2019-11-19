@@ -21,13 +21,18 @@ class Cell:
 
         self.__size_of_maze = maze_size
         self.__id = (x*self.__size_of_maze) + y
+        # self.__id = (y*self.__size_of_maze) + self.x
 
     def change_size_of_maze(self, size):
         self.__size_of_maze = size
         self.__id = (self.x*self.__size_of_maze) + self.y
+        # self.__id = (y * self.__size_of_maze) + self.x
 
     def get_id(self):
         return self.__id
+
+    def get_position(self):
+        return [self.x, self.y]
 
     def has_all_walls(self):
         """Does this cell still have all its walls?"""
