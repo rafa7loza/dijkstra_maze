@@ -74,6 +74,7 @@ def main():
                           destination=maze.cell_at(destination[0], destination[1]).get_id())
     # print(path)
     # print(graph)
+    del graph
     movements = []
     for i in range(len(path)):
         positions = path[i][:2]
@@ -96,7 +97,7 @@ def main():
         plt.imshow(img)
         plt.draw()
         plt.pause(1e-19)
-        time.sleep(0.2)
+        # time.sleep(0.2)
 
     plt.show()
     plt.close()
