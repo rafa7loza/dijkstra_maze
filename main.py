@@ -64,12 +64,6 @@ def main():
     plt.show()
     """
 
-    for i in range(ny):
-        for j in range(nx):
-            cell = maze.cell_at(i, j)
-            # print(cell.x, cell.y)
-            # print(cell.get_id())
-
     graph = generate_graph(maze, nx, ny)
     print(maze.get_current_position())
     print(maze.get_objective_position())
@@ -84,7 +78,7 @@ def main():
     for i in range(len(path)):
         positions = path[i][:2]
         u, v = maze.get_position_by_id(positions[0]), maze.get_position_by_id(positions[1])
-        movements.append([u, v])
+        movements.append([u, v, path[i][2]])
         # path[i] = (x % nx, floor(y / ny))
 
     # print(path)
@@ -93,17 +87,20 @@ def main():
         # new_position = tuple(p[:2])
         new_position = p[1]
         maze.update_current_position(new_position)
+        # print(maze.cell_at(new_position[0], new_position[1]).walls)
+        print(p[2])
         maze.write_svg(svg_name)
         draw = svg2rlg(svg_name)
         renderPM.drawToFile(draw, image_name, fmt='PNG')
         img = mpimg.imread(image_name)
         plt.imshow(img)
         plt.draw()
-        plt.pause(1e-17)
+        plt.pause(1e-19)
         time.sleep(0.2)
 
     plt.show()
     plt.close()
+
 
 
 if __name__ == "__main__":

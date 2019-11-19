@@ -47,7 +47,8 @@ class Maze:
     def __generate_random_traps(self, traps):
         for i in range(traps):
             _x, _y = self.__generate_random_position(self.nx, self.ny)
-            w = randint(2, 9)
+            #w = randint(2, 9)
+            w = 5
             self.cell_at(_x, _y).occupied = True
             self.cell_at(_x, _y).update_weight(w)
 
@@ -58,13 +59,15 @@ class Maze:
                 return [_x, _y]
 
     def __create_objective(self):
-        x, y = self.__generate_random_position(self.nx, self.ny)
+        # x, y = self.__generate_random_position(self.nx, self.ny)
+        x, y = 0, 0
         self.cell_at(x, y).is_objective = True
         self.cell_at(x, y).occupied = True
         self.__objective_position = (x, y)
 
     def __initialize_current_position(self):
-        x, y = self.__generate_random_position(self.nx, self.ny)
+        # x, y = self.__generate_random_position(self.nx, self.ny)
+        x, y = self.nx-1, self.ny-1
         self.cell_at(x, y).is_current_position = True
         self.cell_at(x, y).occupied = True
         self.__current_position = (x, y)
